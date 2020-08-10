@@ -1,10 +1,50 @@
 const TITLES = [
-  {title: `Made for Each Other`},
-  {title: `Sagebrush trail`},
-  {title: `Santa Claus conquers the Marthians`},
-  {title: `The dance of life`},
-  {title: `The great Flamarion`},
-  {title: `The man with the golden arm`},
+  {
+    title: `Созданы друг для друга`,
+    original: `Made for Each Other`
+  },
+  {
+    title: `Папай-морячок встречается с Синдбадом-мореходом`,
+    original: `Popeye the sailor meets Sindbab the sailor`
+  },
+  {
+    title: `След в полыни`,
+    original: `Sagebrush trail`
+  },
+  {
+    title: `Санта Клаус завоёвывает марсиан`,
+    original: `Santa Claus conquers the Marthians`
+  },
+  {
+    title: `Танец жизни`,
+    original: `The dance of life`
+  },
+  {
+    title: `Великий Фламарион`,
+    original: `The great Flamarion`
+  },
+  {
+    title: `Человек с золотой рукой`,
+    original: `The man with the golden arm`
+  }
+];
+
+const AGES = [`0+`, `6+`, `12+`, `16+`, `18+`];
+
+const COUNTRIES = [
+  `Россия`,
+  `Польша`,
+  `Канада`,
+  `Китай`,
+  `Япония`,
+  `Германия`,
+];
+
+const NAMES = [
+  `Олег`,
+  `Сережа`,
+  `Женя`,
+  `Федя`,
 ];
 
 const POSTERS = [
@@ -29,9 +69,19 @@ const DESCRIPTION_QUANTITY = {
   MAX: 5,
 };
 
-const COMMENTS_QUANTITY = [`1 comment`, `2 comments`, `3 comments`, `4 comments`, `5 comments`]; //комментарии — это отдельная структура данных с эмоцией, датой, автором и сообщением, а не просто массив строк в структуре фильма.
+const COMMENTS_QUANTITY = {
+  MIN: 0,
+  MAX: 5
+};
+const COMMENT_DAY = [
+  `2016/11/31 13:39`,
+  `2013/4/31 11:29`,
+  `2011/7/31 6:19`,
+  `2018/3/31 7:23`,
+  `2013/8/31 8:44`,
 
-
+];
+const EMOJI = [`smile.png`, `sleeping.png`, `puke.png`, `angry.png`];
 const FILM_DATE = [`1555`, `1777`, `1666`, `1888`, `1999`];
 
 const FILM_DURATION = [`2h 16m`, `1h 46m`, `1h 54m`, `2h 36m`, `3h 36m`];
@@ -43,7 +93,6 @@ const GENRES = [
   `Драма`,
   `Комедия`,
   `Фэнтeзи`,
-  `Документальный`,
 ];
 
 const getRandomItem = (array) => {
@@ -56,6 +105,15 @@ const getRandomIntInclusive = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+const getRandomGenres = (commentsArr) => {
+  const result = [];
+  const commentsNumber = (Math.random() * (3 - 0) + 0);
+  for (let i = 0; i <= commentsNumber; i += 1) {
+    result.push(getRandomItem(commentsArr));
+  }
+  return result;
+};
+
 const getRandomRating = (min, max) => {
   return (Math.random() * (max - min) + min).toFixed(1);
 };
@@ -66,15 +124,22 @@ const getRandomDescription = (text) => {
 };
 
 const generateFilm = () => {
+  const titles = getRandomItem(TITLES);
   return {
-    title: getRandomItem(TITLES).title,
+    title: titles.title,
+    original: titles.original,
     poster: getRandomItem(POSTERS),
     description: getRandomDescription(DESCRIPTIONS),
-    comments: getRandomItem(COMMENTS_QUANTITY),
     rating: getRandomRating(FILM_RATING.MIN, FILM_RATING.MAX),
     year: getRandomItem(FILM_DATE),
     duration: getRandomItem(FILM_DURATION),
-    genre: getRandomItem(GENRES),
+    genre: getRandomGenres(GENRES),
+    ages: getRandomItem(AGES),
+    countries: getRandomItem(COUNTRIES),
+    comments: generateComments(getRandomIntInclusive(COMMENTS_QUANTITY.MIN, COMMENTS_QUANTITY.MAX)),
+    director: getRandomItem(NAMES),
+    writers: getRandomItem(NAMES),
+    actors: getRandomItem(NAMES),
   };
 };
 
@@ -83,3 +148,15 @@ export const generateFilms = (count) => {
   return new Array(count).fill(``).map(generateFilm);
 };
 
+const generateComment = () => {
+  return {
+    text: getRandomDescription(DESCRIPTIONS),
+    emoji: getRandomItem(EMOJI),
+    author: getRandomItem(NAMES),
+    date: getRandomItem(COMMENT_DAY),
+  };
+};
+
+const generateComments = (count) => {
+  return new Array(count).fill(``).map(generateComment);
+};
