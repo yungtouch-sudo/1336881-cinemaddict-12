@@ -1,6 +1,7 @@
-export const createFilmCard = ({title, poster, description, comments, rating, year, duration, genre}, index) => {
-  return (
-    `    <article data-id = "${index}" class="film-card">
+import {createElement} from "../utils";
+
+const createFilmCard = ({title, poster, description, comments, rating, year, duration, genre}, index) => {
+  return `<article data-id = "${index}" class="film-card">
       <h3 class="film-card__title">${title}</h3>
       <p class="film-card__rating">${rating}</p>
       <p class="film-card__info">
@@ -17,7 +18,27 @@ export const createFilmCard = ({title, poster, description, comments, rating, ye
           <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
         </form>
     </article>`
-  );
-}
-;
+  ;
+};
+export default class FilmCardView {
+  constructor(args) {
+    this._element = null;
+    this._args = args;
+  }
 
+  getTemplate() {
+    return createFilmCard(this._args);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,5 +1,6 @@
-import {commentsBlock} from "./comments-block.js";
-export const createFilmDetalis = ({title, ages, poster, original, rating, description, countries, year, duration, director, writers, actors, genre, comments}) => {
+import {createElement} from "../utils.js";
+import CommentsContainerView from "./CommentsContainerView";
+const createFilmDetalis = ({title, ages, poster, original, rating, description, countries, year, duration, director, writers, actors, genre}, commentsElem) => {
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
     <div class="form-details__top-container">
@@ -77,7 +78,30 @@ export const createFilmDetalis = ({title, ages, poster, original, rating, descri
     </div>
 
     <div class="form-details__bottom-container">
-        ${commentsBlock(comments)}
-      </div>`;
+    ${commentsElem}
+  </div>`;
 };
 
+export default class FilmDetalis {
+  constructor(args) {
+    this._element = null;
+    this._args = args;
+  }
+
+  getTemplate() {
+    return createFilmDetalis(this._args, this._container.getElement());
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._container = new CommentsContainerView(this._args.comments);
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

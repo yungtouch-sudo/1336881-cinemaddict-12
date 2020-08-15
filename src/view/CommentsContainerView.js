@@ -1,10 +1,12 @@
-import {comment} from "./comment.js";
-export const commentsBlock = (comments) =>{
+import {createElement} from "../utils";
+import CommentsView from "./CommentsView";
+
+const commentsContainerView = (number, comments) => {
   return `<section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${number}</span></h3>
 
         <ul class="film-details__comments-list">
-          ${comments.map((el) => comment(el)).join(``)}
+            ${comments}
         </ul>
 
         <div class="film-details__new-comment">
@@ -38,3 +40,29 @@ export const commentsBlock = (comments) =>{
         </div>
       </section>`;
 };
+export default class CommentsContainer {
+  constructor(comments) {
+    this._element = null;
+    this._comments = comments;
+  }
+
+  getTemplate() {
+    return commentsContainerView(
+      this._comments.length,
+      this._commentsObjects.map((comment) => comment.getElement()).join(`\n`),
+    );
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._commentsObjects = this._comments.map((comment) => new CommentsView(comment));
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
