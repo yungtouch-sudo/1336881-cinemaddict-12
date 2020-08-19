@@ -8,10 +8,11 @@ import FilmDetalisView from "./view/FilmDetalisView.js";
 import FilmExstraView from "./view/FilmExstraView.js";
 import {renderElement} from "./utils.js";
 import {generateFilms} from "./mocks/films.js";
+import NoDataView from "./view/NoDataView.js";
 
 const QUANTITY_FILMS = {
   FILM_COUNT: 5,
-  MAX_CARD: 30,
+  MAX_CARD: 0,
   CARD_LINE: 5,
   ADD_MORE: 5,
 };
@@ -29,16 +30,22 @@ const openPopup = (popupElement) => {
 
 
 const getFilmCardRender = (filmCard, containerSelector, quantity) => {
-  const start = 0;
+  let start = 0;
   const container = document.querySelector(containerSelector);
   return () => {
-    for (let i = start; i < start + quantity; i += 1) {
-      renderElement(container, filmCard[i].card.getElement());
+    if (filmCard.length === 0) {
+      const getNoData = new NoDataView();
+      renderElement(container, getNoData.getElement());
+    } else {
+      for (let i = start; i < start + quantity; i += 1) {
+        renderElement(container, filmCard[i].card.getElement());
 
-      filmCard[i].card.getElement().addEventListener(`click`, () => {
-        openPopup(filmCard[i].popup.getElement());
-      });
+        filmCard[i].card.getElement().addEventListener(`click`, () => {
+          openPopup(filmCard[i].popup.getElement());
+        });
 
+      }
+      start += QUANTITY_FILMS.ADD_MORE;
     }
   };
 };
@@ -74,9 +81,11 @@ filmCardsRender();
 
 const filmsElement = siteMainElement.querySelector(`.films`);
 
-const showMore = new ButtonShowMoreView();
-renderElement(filmsElement, showMore.getElement());
-
+if (films.length > 0) {
+  const showMore = new ButtonShowMoreView();
+  renderElement(filmsElement, showMore.getElement());
+  showMore.getElement().addEventListener(`click`, filmCardsRender);
+}
 
 const topRatedFilmCards = topRatedFilms.map((film) => {
   const card = new FilmCardView(film);
