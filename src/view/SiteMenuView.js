@@ -1,4 +1,4 @@
-import {createElement} from "../utils";
+import AbstractView from "./BaseView.js";
 
 const createSiteMenu = () => {
   return `<nav class="main-navigation">
@@ -9,27 +9,10 @@ const createSiteMenu = () => {
         <a href="#favorites" class="main-navigation__item">Favorites <span class="main-navigation__item-count">8</span></a>
       </div>
       <a href="#stats" class="main-navigation__additional">Stats</a>
-    </nav>`
-;
+    </nav>`;
 };
-export default class SiteMenuView {
-  constructor() {
-    this._element = null;
-  }
-
+export default class SiteMenuView extends AbstractView {
   getTemplate() {
     return createSiteMenu();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

@@ -1,4 +1,4 @@
-import {createElement} from "../utils";
+import AbstractView from "./BaseView.js";
 
 const getNoData = () => {
   return `<section class="films-list">
@@ -6,25 +6,9 @@ const getNoData = () => {
   </section>`;
 };
 
-export default class NoDataView {
-  constructor() {
-    this._element = null;
-  }
-
+export default class NoDataView extends AbstractView {
   getTemplate() {
     return getNoData();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

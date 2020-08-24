@@ -1,28 +1,14 @@
-import {createElement} from "../utils.js";
+import AbstractView from "./BaseView.js";
+
 const createUserRank = () => {
   return `<section class="header__profile profile">
       <p class="profile__rating">Movie Buff</p>
       <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
     </section>`;
 };
-export default class UserRankView {
-  constructor() {
-    this._element = null;
-  }
+export default class UserRankView extends AbstractView {
 
   getTemplate() {
     return createUserRank();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

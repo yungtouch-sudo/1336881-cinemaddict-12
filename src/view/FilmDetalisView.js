@@ -1,5 +1,6 @@
-import {createElement} from "../utils.js";
 import commentsView from "./CommentsView.js";
+import AbstractView from "./BaseView";
+
 const createFilmDetalis = ({title, ages, poster, original, rating, description, countries, year, duration, director, writers, actors, genre, comments}) => {
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
@@ -82,25 +83,13 @@ const createFilmDetalis = ({title, ages, poster, original, rating, description, 
   </div>`;
 };
 
-export default class FilmDetalis {
+export default class FilmDetalis extends AbstractView {
   constructor(args) {
-    this._element = null;
+    super();
     this._args = args;
   }
 
   getTemplate() {
     return createFilmDetalis(this._args);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
