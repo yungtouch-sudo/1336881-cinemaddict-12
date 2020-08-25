@@ -41,9 +41,10 @@ export default class MovieList {
       return {card, popup};
     });
     this.mostCommentedContainer = new FilmExstraView([`Most commented`, `most-commented`]);
+    this.showMore = new ButtonShowMoreView();
   }
 
-  getFilmCardRender(filmCard, containerSelector, quantity) {
+  getFilmCardRender(filmCard, containerSelector, quantity, isShowMore = false) {
     let start = 0;
     const container = document.querySelector(containerSelector);
     return () => {
@@ -60,6 +61,9 @@ export default class MovieList {
 
         }
         start += QUANTITY.ADD_MORE;
+        if (Number(start) >= Number(filmCard.length) && isShowMore) {
+          this.showMore.getElement().remove();
+        }
       }
     };
   }
@@ -70,12 +74,11 @@ export default class MovieList {
     renderElement(siteMainElement, this.siteSorting.getElement());
     renderElement(siteMainElement, this.filmsContainer.getElement());
     const filmsElement = siteMainElement.querySelector(`.films`);
-    this.filmCardsRender = this.getFilmCardRender(this.filmCards, `.films-list__container`, QUANTITY.FILM_COUNT);
+    this.filmCardsRender = this.getFilmCardRender(this.filmCards, `.films-list__container`, QUANTITY.FILM_COUNT, true);
     this.filmCardsRender();
     if (this.films.length > 0) {
-      const showMore = new ButtonShowMoreView();
-      renderElement(filmsElement, showMore.getElement());
-      showMore.setEventListener(`click`, this.filmCardsRender);
+      renderElement(filmsElement, this.showMore.getElement());
+      this.showMore.setEventListener(`click`, this.filmCardsRender);
     }
     renderElement(filmsElement, this.topRatedContainer.getElement());
     this.getFilmCardRender(this.topRatedFilmCards, `.top-rated .films-list__container`, this.topRatedFilms.length)();
