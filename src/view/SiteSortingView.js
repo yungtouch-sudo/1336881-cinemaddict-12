@@ -1,4 +1,4 @@
-import {createElement} from "../utils";
+import AbstractView from "./BaseView.js";
 
 const createSiteSorting = () => {
   return `<ul class="sort">
@@ -7,24 +7,8 @@ const createSiteSorting = () => {
       <li><a href="#" class="sort__button">Sort by rating</a></li>
     </ul>`;
 };
-export default class SiteSortingView {
-  constructor() {
-    this._element = null;
-  }
-
+export default class SiteSortingView extends AbstractView {
   getTemplate() {
     return createSiteSorting();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

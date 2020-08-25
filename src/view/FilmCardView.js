@@ -1,4 +1,5 @@
 import {createElement} from "../utils";
+import AbstractView from "./BaseView";
 
 const createFilmCard = ({title, poster, description, comments, rating, year, duration, genre}, index) => {
   return `<article data-id = "${index}" class="film-card">
@@ -17,28 +18,15 @@ const createFilmCard = ({title, poster, description, comments, rating, year, dur
           <button class="film-card__controls-item button film-card__controls-item--mark-as-watched">Mark as watched</button>
           <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
         </form>
-    </article>`
-  ;
+    </article>`;
 };
-export default class FilmCardView {
+export default class FilmCardView extends AbstractView {
   constructor(args) {
-    this._element = null;
+    super();
     this._args = args;
   }
 
   getTemplate() {
     return createFilmCard(this._args);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
