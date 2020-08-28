@@ -1,4 +1,3 @@
-import {createElement} from "../utils";
 import AbstractView from "./BaseView";
 
 const createFilmCard = ({title, poster, description, comments, rating, year, duration, genre}, index) => {
