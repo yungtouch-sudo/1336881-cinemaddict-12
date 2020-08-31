@@ -9,14 +9,20 @@ import FilmCardView from "../view/FilmCardView";
 import FilmDetalisView from "../view/FilmDetalisView";
 import ButtonShowMoreView from "../view/ButtonShowMoreView";
 import FilmExstraView from "../view/FilmExstraView";
+import {RenderPosition} from "../utils";
+import {SortType} from "../consts.js";
+import {sortFilmDate} from "../utils";
+import {sortFilmRating} from "../utils";
+
 
 const siteHeaderElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
-//const siteFooterElement = document.querySelector(`.footer`);
+// const siteFooterElement = document.querySelector(`.footer`);
 
 export default class MovieList {
   constructor(films, topRatedFilms, mostCommentedFilms) {
     this.films = films;
+    this._currentSortType = SortType.DEFAULT;
     this.userRank = new UserRankView();
     this.siteMenu = new SiteMenuView();
     this.siteSorting = new SiteSortingView();
@@ -42,17 +48,24 @@ export default class MovieList {
     });
     this.mostCommentedContainer = new FilmExstraView([`Most commented`, `most-commented`]);
     this.showMore = new ButtonShowMoreView();
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._sortComponent = new SiteSortingView();
+    this._currentSortType = SortType.DEFAULT;
+    this._renderedFilmCount = 5;
+    this.showedFilm = 0;
   }
 
   getFilmCardRender(filmCard, containerSelector, quantity, isShowMore = false) {
-    let start = 0;
     const container = document.querySelector(containerSelector);
     return () => {
       if (filmCard.length === 0) {
         const getNoData = new NoDataView();
         renderElement(container, getNoData.getElement());
       } else {
-        for (let i = start; i < start + quantity; i += 1) {
+        for (let i = 0; i < this.showedFilm + quantity; i += 1) {
+          if (!filmCard[i]) {
+            break;
+          }
           renderElement(container, filmCard[i].card.getElement());
 
           filmCard[i].card.setEventListener(`click`, () => {
@@ -60,30 +73,42 @@ export default class MovieList {
           });
 
         }
-        start += QUANTITY.ADD_MORE;
-        if (Number(start) >= Number(filmCard.length) && isShowMore) {
-          this.showMore.getElement().remove();
+        if (isShowMore) {
+          this.showedFilm += QUANTITY.ADD_MORE;
+          if (Number(this.showedFilm) >= Number(filmCard.length) && isShowMore) {
+            this.showMore.getElement().remove();
+          }
         }
       }
     };
   }
 
   render() {
+    this._sourcedMovieListCards = this.filmCards.slice();
     renderElement(siteHeaderElement, this.userRank.getElement());
     renderElement(siteMainElement, this.siteMenu.getElement());
-    renderElement(siteMainElement, this.siteSorting.getElement());
+    this._renderSort();
     renderElement(siteMainElement, this.filmsContainer.getElement());
+
+    this._renderFilmList(true);
+  }
+
+  _renderFilmList(isReload = false) {
     const filmsElement = siteMainElement.querySelector(`.films`);
     this.filmCardsRender = this.getFilmCardRender(this.filmCards, `.films-list__container`, QUANTITY.FILM_COUNT, true);
     this.filmCardsRender();
-    if (this.films.length > 0) {
+    if (this.films.length > 0 && isReload) {
       renderElement(filmsElement, this.showMore.getElement());
-      this.showMore.setEventListener(`click`, this.filmCardsRender);
+      this.showMore.setEventListener(`click`, () => {
+        this._clearFilmList();
+        this.filmCardsRender();
+      });
     }
     renderElement(filmsElement, this.topRatedContainer.getElement());
     this.getFilmCardRender(this.topRatedFilmCards, `.top-rated .films-list__container`, this.topRatedFilms.length)();
     renderElement(filmsElement, this.mostCommentedContainer.getElement());
     this.getFilmCardRender(this.mostCommendFilmCard, `.most-commented .films-list__container`, this.mostCommentedFilms.length)();
+
   }
 
   openPopup(popupElement) {
@@ -95,6 +120,40 @@ export default class MovieList {
         popupElement.remove();
       }
     });
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+    this._sortFilms(sortType);
+    this._clearFilmList();
+    this._renderFilmList();
+  }
+
+  _renderSort() {
+    renderElement(siteMainElement, this.siteSorting.getElement(), RenderPosition.BEFOREEND);
+    this.siteSorting.setSortTypeChangeHandler(this._handleSortTypeChange);
+  }
+
+  _sortFilms(sortType) {
+    switch (sortType) {
+      case SortType.DATE:
+        this.filmCards = this.filmCards.sort(sortFilmDate);
+        break;
+      case SortType.RATING:
+        this.filmCards = this.filmCards.sort(sortFilmRating);
+        break;
+      default:
+        this.filmCards = this._sourcedMovieListCards.slice();
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _clearFilmList() {
+    document.querySelector(`.films-list__container`).innerHTML = ``;
+    this._renderedFilmCount = 5;
   }
 
 }
