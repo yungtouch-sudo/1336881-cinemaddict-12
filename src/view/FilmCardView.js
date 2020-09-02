@@ -28,4 +28,22 @@ export default class FilmCardView extends AbstractView {
   getTemplate() {
     return createFilmCard(this._args);
   }
+  setAddWatchListHandler(callback) {
+    this.getElement().querySelector(`.film-card__controls-item--add-to-watchlist`)
+      .addEventListener(`click`, () => {
+        callback(this._args);
+      });
+  }
+  setAllreadyWatchedHandler(callback) {
+    this.getElement().querySelector(`.film-card__controls-item--mark-as-watched`)
+      .addEventListener(`click`, () => {
+        callback(this._args);
+      });
+  }
+  setFavoriteHandler(callback) {
+    this.getElement().querySelector(`.film-card__controls-item--favorite`)
+      .addEventListener(`click`, () => {
+        callback(this._args);
+      });
+  }
 }
