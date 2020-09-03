@@ -92,4 +92,22 @@ export default class FilmDetalis extends AbstractView {
   getTemplate() {
     return createFilmDetalis(this._args);
   }
+  setAddWatchListHandler(callback) {
+    this.getElement().querySelector(`.film-details__control-label--watchlist`)
+      .addEventListener(`click`, () => {
+        callback(this._args);
+      });
+  }
+  setAllreadyWatchedHandler(callback) {
+    this.getElement().querySelector(`.film-details__control-label--watched`)
+      .addEventListener(`click`, () => {
+        callback(this._args);
+      });
+  }
+  setFavoriteHandler(callback) {
+    this.getElement().querySelector(`.film-details__control-label--favorite`)
+      .addEventListener(`click`, () => {
+        callback(this._args);
+      });
+  }
 }

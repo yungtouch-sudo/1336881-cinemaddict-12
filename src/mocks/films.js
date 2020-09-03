@@ -140,6 +140,9 @@ const generateFilm = () => {
     director: getRandomItem(NAMES),
     writers: getRandomItem(NAMES),
     actors: getRandomItem(NAMES),
+    isWatchList: false,
+    isAllreadyWatched: false,
+    isFavorite: false,
   };
 };
 

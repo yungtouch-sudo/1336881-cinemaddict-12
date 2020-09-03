@@ -13,6 +13,7 @@ import {RenderPosition} from "../utils";
 import {SortType} from "../consts.js";
 import {sortFilmDate} from "../utils";
 import {sortFilmRating} from "../utils";
+import Popup from "../view/FilmCardView";
 
 
 const siteHeaderElement = document.querySelector(`.header`);
@@ -37,7 +38,14 @@ export default class MovieList {
     this.mostCommentedFilms = mostCommentedFilms;
     this.topRatedFilmCards = topRatedFilms.map((film) => {
       const card = new FilmCardView(film);
+      card.setAddWatchListHandler(this.AddToWatchListHandler.bind(this));
+      card.setAllreadyWatchedHandler(this.AllreadyWatchedHandler.bind(this));
+      card.setFavoriteHandler(this.FavoriteHandler.bind(this));
       const popup = new FilmDetalisView(film);
+      popup.setAddWatchListHandler(this.AddToWatchListHandler.bind(this));
+      popup.setAllreadyWatchedHandler(this.AllreadyWatchedHandler.bind(this));
+      popup.setFavoriteHandler(this.FavoriteHandler.bind(this));
+
       return {card, popup};
     });
     this.topRatedContainer = new FilmExstraView([`Top Rated`, `top-rated`]);
@@ -53,6 +61,7 @@ export default class MovieList {
     this._currentSortType = SortType.DEFAULT;
     this._renderedFilmCount = 5;
     this.showedFilm = 0;
+    this._popup = new Popup();
   }
 
   getFilmCardRender(filmCard, containerSelector, quantity, isShowMore = false) {
@@ -69,7 +78,7 @@ export default class MovieList {
           renderElement(container, filmCard[i].card.getElement());
 
           filmCard[i].card.setEventListener(`click`, () => {
-            this.openPopup(filmCard[i].popup.getElement());
+            this.openPopup(filmCard[i].popup);
           });
 
         }
@@ -111,13 +120,13 @@ export default class MovieList {
 
   }
 
-  openPopup(popupElement) {
-    renderElement(siteMainElement, popupElement);
-    popupElement.querySelector(`.film-details__close-btn`)
-      .addEventListener(`click`, () => popupElement.remove());
+  openPopup(popup) {
+    renderElement(siteMainElement, popup.getElement());
+    popup.getElement().querySelector(`.film-details__close-btn`)
+      .addEventListener(`click`, () => popup.removeElement());
     document.addEventListener(`keydown`, (e) => {
       if (e.key === `Escape`) {
-        popupElement.remove();
+        popup.removeElement();
       }
     });
   }
@@ -155,6 +164,14 @@ export default class MovieList {
     document.querySelector(`.films-list__container`).innerHTML = ``;
     this._renderedFilmCount = 5;
   }
-
+  AddToWatchListHandler(object) {
+    object.isWatchList = true;
+  }
+  AllreadyWatchedHandler(object) {
+    object.isAllreadyWatched = true;
+  }
+  FavoriteHandler(object) {
+    object.isFavorite = true;
+  }
 }
 
