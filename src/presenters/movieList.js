@@ -78,8 +78,7 @@ export default class MovieList {
           renderElement(container, filmCard[i].card.getElement());
 
           filmCard[i].card.setEventListener(`click`, () => {
-            const popup = new Popup(filmCard[i].popup.getElement());
-            this.openPopup(popup);
+            this.openPopup(filmCard[i].popup);
           });
 
         }
@@ -124,10 +123,10 @@ export default class MovieList {
   openPopup(popup) {
     renderElement(siteMainElement, popup.getElement());
     popup.getElement().querySelector(`.film-details__close-btn`)
-      .addEventListener(`click`, () => popup.remove());
+      .addEventListener(`click`, () => popup.removeElement());
     document.addEventListener(`keydown`, (e) => {
       if (e.key === `Escape`) {
-        popup.remove();
+        popup.removeElement();
       }
     });
   }
