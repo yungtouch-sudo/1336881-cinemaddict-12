@@ -95,6 +95,8 @@ const GENRES = [
   `Фэнтeзи`,
 ];
 
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+
 const getRandomItem = (array) => {
   return array[Math.floor(Math.random() * array.length)];
 };
@@ -126,6 +128,7 @@ const getRandomDescription = (text) => {
 const generateFilm = () => {
   const titles = getRandomItem(TITLES);
   return {
+    id: generateId(),
     title: titles.title,
     original: titles.original,
     poster: getRandomItem(POSTERS),

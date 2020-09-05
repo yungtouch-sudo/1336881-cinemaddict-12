@@ -14,6 +14,9 @@ import {SortType} from "../consts.js";
 import {sortFilmDate} from "../utils";
 import {sortFilmRating} from "../utils";
 import Popup from "../view/FilmCardView";
+import Movie from "../model/movies";
+import FilterModel from "../model/filter";
+
 
 
 const siteHeaderElement = document.querySelector(`.header`);
@@ -21,18 +24,22 @@ const siteMainElement = document.querySelector(`.main`);
 // const siteFooterElement = document.querySelector(`.footer`);
 
 export default class MovieList {
-  constructor(films, topRatedFilms, mostCommentedFilms) {
-    this.films = films;
+  constructor(movies, topRatedFilms, mostCommentedFilms) {
+    const filters = [
+      {
+        type: `all`,
+        name: `ALL`,
+        count: 0
+      }
+    ];
+
+
+    this.movies = movies;
     this._currentSortType = SortType.DEFAULT;
     this.userRank = new UserRankView();
-    this.siteMenu = new SiteMenuView();
+    this.siteMenu = new SiteMenuView(filters, `all`);
     this.siteSorting = new SiteSortingView();
     this.filmsContainer = new FilmsContainerView();
-    this.filmCards = films.map((film) => {
-      const card = new FilmCardView(film);
-      const popup = new FilmDetalisView(film);
-      return {card, popup};
-    });
 
     this.topRatedFilms = topRatedFilms;
     this.mostCommentedFilms = mostCommentedFilms;
@@ -60,31 +67,33 @@ export default class MovieList {
     this._sortComponent = new SiteSortingView();
     this._currentSortType = SortType.DEFAULT;
     this._renderedFilmCount = 5;
-    this.showedFilm = 0;
+    this.showedFilm = 5;
     this._popup = new Popup();
   }
 
-  getFilmCardRender(filmCard, containerSelector, quantity, isShowMore = false) {
+  getFilmCardRender(movies, containerSelector, quantity, isShowMore = false) {
     const container = document.querySelector(containerSelector);
     return () => {
-      if (filmCard.length === 0) {
+      if (movies.length === 0) {
         const getNoData = new NoDataView();
         renderElement(container, getNoData.getElement());
       } else {
-        for (let i = 0; i < this.showedFilm + quantity; i += 1) {
-          if (!filmCard[i]) {
+        let showed = 0;
+        for (let movie of movies) {
+          if (showed >= this.showedFilm) {
             break;
           }
-          renderElement(container, filmCard[i].card.getElement());
+          showed++;
+          renderElement(container, movie.card.getElement());
 
-          filmCard[i].card.setEventListener(`click`, () => {
-            this.openPopup(filmCard[i].popup);
+          movie.card.setEventListener(`click`, () => {
+            this.openPopup(movie.popup);
           });
 
         }
         if (isShowMore) {
           this.showedFilm += QUANTITY.ADD_MORE;
-          if (Number(this.showedFilm) >= Number(filmCard.length) && isShowMore) {
+          if (Number(this.showedFilm) >= Number(movies.length) && isShowMore) {
             this.showMore.getElement().remove();
           }
         }
@@ -93,20 +102,19 @@ export default class MovieList {
   }
 
   render() {
-    this._sourcedMovieListCards = this.filmCards.slice();
+    this._sourcedMovieListCards = this.movies.getAllMovies().slice();
     renderElement(siteHeaderElement, this.userRank.getElement());
     renderElement(siteMainElement, this.siteMenu.getElement());
     this._renderSort();
     renderElement(siteMainElement, this.filmsContainer.getElement());
-
     this._renderFilmList(true);
   }
 
   _renderFilmList(isReload = false) {
     const filmsElement = siteMainElement.querySelector(`.films`);
-    this.filmCardsRender = this.getFilmCardRender(this.filmCards, `.films-list__container`, QUANTITY.FILM_COUNT, true);
+    this.filmCardsRender = this.getFilmCardRender(this.movies, `.films-list__container`, QUANTITY.FILM_COUNT, true);
     this.filmCardsRender();
-    if (this.films.length > 0 && isReload) {
+    if (this.movies.length > 0 && isReload) {
       renderElement(filmsElement, this.showMore.getElement());
       this.showMore.setEventListener(`click`, () => {
         this._clearFilmList();
