@@ -1,5 +1,5 @@
 import Observer from "../utils/Observer.js";
-import {FilterType} from "../mocks/consts";
+import {FilterType} from "../consts";
 
 export default class Filter extends Observer {
   constructor() {
@@ -7,9 +7,9 @@ export default class Filter extends Observer {
     this._activeFilter = FilterType.ALL;
   }
 
-  setFilter(updateType, filter) {
+  setFilter(filter) {
     this._activeFilter = filter;
-    this._notify(updateType, filter);
+    this._notify(filter);
   }
 
   getFilter() {

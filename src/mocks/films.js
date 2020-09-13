@@ -156,6 +156,7 @@ export const generateFilms = (count) => {
 
 const generateComment = () => {
   return {
+    id: generateId(),
     text: getRandomDescription(DESCRIPTIONS),
     emoji: getRandomItem(EMOJI),
     author: getRandomItem(NAMES),

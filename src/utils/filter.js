@@ -1,4 +1,4 @@
-import {FilterType} from "../mocks/consts.js";
+import {FilterType} from "../consts.js";
 
 export const filter = {
   [FilterType.ALL]: (films) => films,
@@ -6,4 +6,3 @@ export const filter = {
   [FilterType.HISTORY]: (films) => films.filter((film) => film.isAllreadyWatched),
   [FilterType.FAVORITES]: (films) => films.filter((film) => film.isFavorite),
 };
-

@@ -1,7 +1,7 @@
 import commentsView from "./CommentsView.js";
 import AbstractView from "./BaseView";
 
-const createFilmDetalis = ({title, ages, poster, original, rating, description, countries, year, duration, director, writers, actors, genre, comments}) => {
+const createFilmDetalis = ({title, ages, poster, original, rating, description, countries, year, duration, director, writers, actors, genre, comments, isFavorite, isWatchList, isAllreadyWatched}) => {
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
     <div class="form-details__top-container">
@@ -67,19 +67,20 @@ const createFilmDetalis = ({title, ages, poster, original, rating, description, 
       </div>
 
       <section class="film-details__controls">
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
+        <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" ${isWatchList ? `checked="checked"` : ``} name="watchlist">
         <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
 
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
+        <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" ${isAllreadyWatched ? `checked="checked"` : ``} name="watched">
         <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
 
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
+        <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" ${isFavorite ? `checked="checked"` : ``} name="favorite">
         <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
       </section>
     </div>
 
     <div class="form-details__bottom-container">
     ${commentsView(comments)}
+    </div>
   </div>`;
 };
 
@@ -92,22 +93,32 @@ export default class FilmDetalis extends AbstractView {
   getTemplate() {
     return createFilmDetalis(this._args);
   }
-  setAddWatchListHandler(callback) {
-    this.getElement().querySelector(`.film-details__control-label--watchlist`)
-      .addEventListener(`click`, () => {
-        callback(this._args);
-      });
+
+  setDeleteCommentHandler(callback) {
+    this.getElement().querySelector('.form-details__bottom-container').addEventListener('click', (e) => {
+      if(e.target.dataset.id) {
+        callback(this._args.id, e.target.dataset.id);
+      }
+    })
   }
-  setAllreadyWatchedHandler(callback) {
-    this.getElement().querySelector(`.film-details__control-label--watched`)
-      .addEventListener(`click`, () => {
-        callback(this._args);
-      });
+
+
+  setUpdateHandler(callback) {
+    this.getElement().querySelector('.film-details__controls').addEventListener('click', (e) => {
+      this._updateHandler(e.target, callback);
+    })
   }
-  setFavoriteHandler(callback) {
-    this.getElement().querySelector(`.film-details__control-label--favorite`)
-      .addEventListener(`click`, () => {
-        callback(this._args);
-      });
+
+  _updateHandler(target, callback) {
+    if(target.id === 'watchlist') {
+      return callback(this._args.id, {isWatchList: !this._args.isWatchList});
+    }
+    if(target.id === 'watched') {
+      return callback(this._args.id, {isAllreadyWatched: !this._args.isAllreadyWatched});
+    }
+    if(target.id === 'favorite') {
+      return callback(this._args.id, {isFavorite: !this._args.isFavorite});
+    }
+
   }
 }
