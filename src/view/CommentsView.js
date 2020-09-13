@@ -39,7 +39,7 @@ export default (comments) => {
       </section>`;
 };
 
-const createComment = ({emoji, text, date, author}) => {
+const createComment = ({emoji, text, date, author, id}) => {
   return `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
               <img src="./images/emoji/${emoji}" width="55" height="55" alt="emoji-smile">
@@ -49,9 +49,8 @@ const createComment = ({emoji, text, date, author}) => {
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${author}</span>
                 <span class="film-details__comment-day">${date}</span>
-                <button class="film-details__comment-delete">Delete</button>
+                <button class="film-details__comment-delete" data-id="${id}">Delete</button>
               </p>
             </div>
           </li>`;
 };
-
