@@ -1,3 +1,5 @@
+import he from "he";
+import moment from "moment";
 export default (comments) => {
 
     const commentsHtml = comments.map((comment) => createComment(comment)).join(``);
@@ -47,10 +49,10 @@ export default (comments) => {
                 <img src="./images/emoji/${emoji}.png" width="55" height="55" alt="emoji-smile">
               </span>
               <div>
-                <p class="film-details__comment-text">${text}</p>
+                <p class="film-details__comment-text">${he.encode(text)}</p>
                 <p class="film-details__comment-info">
                   <span class="film-details__comment-author">${author}</span>
-                  <span class="film-details__comment-day">${date}</span>
+                  <span class="film-details__comment-day">${moment(date).format(`YYYY/MM/DD hh:mm`)}</span>
                   <button class="film-details__comment-delete" data-id="${id}">Delete</button>
                 </p>
               </div>
