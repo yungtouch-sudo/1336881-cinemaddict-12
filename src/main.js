@@ -1,72 +1,52 @@
-import {generateFilms} from "./mocks/films.js";
-import MovieList from "./utils/movieList.js";
-import Filter from './presenters/filter';
-import {QUANTITY} from "./mocks/consts.js";
-import Movies from "./model/movies.js";
-import FilterModel from "./model/filter";
-import {renderElement} from "./utils";
-import UserRankView from "./view/UserRankView";
-import SiteMenuView from "./view/SiteMenuView";
-import SiteSortingView from "./view/SiteSortingView";
-import FilmsContainerView from "./view/FilmsContainerView";
-import ButtonShowMoreView from "./view/ButtonShowMoreView";
-import FilmExstraView from "./view/FilmExstraView";
-import {SortType, FilterType} from "./consts.js";
-import {sortFilmDate} from "./utils";
-import {sortFilmRating} from "./utils";
-import {filter} from './utils/filter';
-
-
-const films = generateFilms(QUANTITY.MAX_CARD);
-
-const filterModel = new FilterModel();
-const moviesModel = new Movies(films, filterModel);
-const mostCommentedMovieModel = new Movies(films.slice(0, 2), filterModel);
-const topRatedMovieModel = new Movies(films.slice(2, 4), filterModel);
+import { renderElement } from './utils/dom';
+import FilterModel from './models/FilterModel';
+import FilmsModel from './models/FilmsModel';
+import SortModel from './models/SortModel';
+import FilterPresenter from "./presenters/FilterPresenter";
+import MainFilmListPresenter from './presenters/MainFilmListPresenter';
+import MostCommentedListPresenter from './presenters/MostCommentedListPresenter';
+import TopRatedListPresenter from './presenters/TopRatedListPresenter';
+import FilmsContainerView from "./views/FilmsContainerView";
+import UserRankView from './views/UserRankView';
+import LoadingView from './views/LoadingView';
+import SortPresenter from "./presenters/SortPresenter";
+import Api from './utils/Api';
+import CONFIG from './config';
 
 const siteHeaderElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
 
-const userRank = new UserRankView();
-const siteSorting = new SiteSortingView();
-const filmsContainer = new FilmsContainerView();
-const topRatedContainer = new FilmExstraView([`Top Rated`, `top-rated`]);
-const mostCommentedContainer = new FilmExstraView([`Most commented`, `most-commented`]);
+const api = new Api(CONFIG.END_POINT, CONFIG.AUTHORIZATION);
 
-const filterPresenter = new Filter(siteMainElement, filterModel, moviesModel);
+const filterModel = new FilterModel();
+const sortModel = new SortModel();
+const filmsModel = new FilmsModel(filterModel, sortModel);
 
-renderElement(siteHeaderElement, userRank.getElement());
+const filmsContainerView = new FilmsContainerView();
 
-filterPresenter.init();
+const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
+const sortPresenter = new SortPresenter(siteMainElement, sortModel);
+const mainFilmListPresenter = new MainFilmListPresenter(filmsModel, filmsContainerView.getContainer());
+const mostCommentedListPresenter = new MostCommentedListPresenter(filmsModel, filmsContainerView.getElement());
+const topRatedListPresenter = new TopRatedListPresenter(filmsModel, filmsContainerView.getElement());
 
-renderElement(siteMainElement, siteSorting.getElement());
-renderElement(siteMainElement, filmsContainer.getElement());
+const userRankView = new UserRankView();
+const loadingView = new LoadingView();
 
-const filmsElement = siteMainElement.querySelector(`.films`);
-const filmsContainerElement = filmsElement.querySelector('.films-list__container');
-const mostCommentedContainerElement = mostCommentedContainer.getElement().querySelector('.films-list__container');
-const topRatedContainerElement = topRatedContainer.getElement().querySelector('.films-list__container');
+renderElement(siteHeaderElement, userRankView.getElement());
+renderElement(siteMainElement, loadingView.getElement());
 
-const movieList = new MovieList(moviesModel, filmsContainerElement, QUANTITY.FILM_COUNT);
-const topRatedMovieList = new MovieList(topRatedMovieModel, topRatedContainerElement, QUANTITY.FILM_COUNT, true);
-const mostCommentedMovieList = new MovieList(mostCommentedMovieModel, mostCommentedContainerElement, QUANTITY.FILM_COUNT, true);
+api.getFilms().then((films) => {
+    loadingView.removeElement();
 
+    filmsModel.setFilms(films);
 
-movieList.init();
+    filterPresenter.render();
+    sortPresenter.render();
 
-renderElement(filmsElement, topRatedContainer.getElement());
-renderElement(filmsElement, mostCommentedContainer.getElement());
+    renderElement(siteMainElement, filmsContainerView.getElement());
 
-topRatedMovieList.init();
-mostCommentedMovieList.init();
-
-
-siteSorting.setSortTypeChangeHandler(SortTypeChangeHandler);
-
-
-function SortTypeChangeHandler(sortType) {
-    if (moviesModel.sortType === sortType) {
-      return;
-    }
-    moviesModel.sortType = sortType;
-}
+    mainFilmListPresenter.render();
+    topRatedListPresenter.render();
+    mostCommentedListPresenter.render();
+});
