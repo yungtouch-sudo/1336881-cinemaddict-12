@@ -17,7 +17,7 @@ export default class FilmDetalis extends AbstractView {
       if(e.target.dataset.id) {
         callback(this._data.id, e.target.dataset.id);
       }
-    })
+    });
   }
 
   setUpdateHandler(callback) {
