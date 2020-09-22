@@ -10,4 +10,14 @@ export default class Comments extends AbstractView {
   getTemplate() {
     return commentsTemplate(this._model.getAll());
   }
+
+  setDeleteCommentHandler(callback) {
+    this.getElement().querySelector('.film-details__comments-list').addEventListener('click', (e) => {
+      e.preventDefault();
+      if(e.target.classList.contains('film-details__comment-delete')) {
+        e.target.textContent = `Deleting...`
+        callback(e.target.dataset.id);
+      }
+    })
+  }
 }

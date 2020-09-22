@@ -17,6 +17,7 @@ export default class FilmDetailsPresenter {
         this._mainContainer = document.querySelector(`.main`);
         this._commentsContainer = this._popupView.getElement().querySelector('.form-details__bottom-container');
         this._popupView.setAddCommentHandler(this._addCommentHandler.bind(this));
+        this._popupView.setDeleteCommentHandler(this._deleteCommentHandler.bind(this));
 
         this._commentsModel.addObserver(this._handleModelEvent.bind(this));
 
@@ -48,6 +49,10 @@ export default class FilmDetailsPresenter {
         if(this._opened) {
             this._commentsModel.add(data);
         }
+    }
+
+    _deleteCommentHandler(id) {
+        this._commentsModel.remove(id);
     }
 
     _closeHandler() {

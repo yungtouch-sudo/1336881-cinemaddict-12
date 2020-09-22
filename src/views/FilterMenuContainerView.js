@@ -9,4 +9,15 @@ export default class FilterMenuContainer extends AbstractView {
   getTemplate() {
     return filterMenuContainerTemplate();
   }
+
+  getContainer() {
+    return this.getElement().querySelector('.main-navigation__items-container');
+  }
+
+  setStatisticClickHandler(callback) {
+    this.getElement().querySelector(`.main-navigation__additional`).addEventListener('click', (e) => {
+      e.preventDefault();
+      callback();
+    })
+  }
 }

@@ -37,8 +37,12 @@ export default class CommentsModel extends Observer {
     }
 
     remove(id) {
-        this._comments = this._comments.filter((comment) => comment.id !== id);
-        this._notify();
+        this._api.removeComment(id).then((request) => {
+            console.log(request);
+            this._comments = this._comments.filter((comment) => comment.id !== id);
+            this._notify();
+        })
+
     }
 
     static adaptToClient(data) {

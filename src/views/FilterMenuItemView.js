@@ -24,7 +24,8 @@ export default class FilterMenuItemView extends AbstractView {
 
   _filterChangeHandler(evt) {
     evt.preventDefault();
-    this.getElement().querySelector('.main-navigation__item--active').classList.remove('main-navigation__item--active');
+    const active = this.getElement().querySelector('.main-navigation__item--active');
+    if (active) active.classList.remove('main-navigation__item--active');
     evt.target.classList.add('main-navigation__item--active');
     this._callback.filterTypeChange(evt.target.dataset.type);
   }

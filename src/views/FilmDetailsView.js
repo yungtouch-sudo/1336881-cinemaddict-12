@@ -15,7 +15,9 @@ export default class FilmDetalis extends AbstractView {
   setDeleteCommentHandler(callback) {
     this.getElement().querySelector('.form-details__bottom-container').addEventListener('click', (e) => {
       if(e.target.dataset.id) {
-        callback(this._data.id, e.target.dataset.id);
+        e.preventDefault()
+        e.target.textContent = 'Deleting...';
+        callback(e.target.dataset.id);
       }
     });
   }
@@ -40,14 +42,21 @@ export default class FilmDetalis extends AbstractView {
       if(e.key === `Enter` && e.ctrlKey) {
         const date = new Date(Date.now())
         const form = new FormData(this.getElement().querySelector(`.film-details__inner`));
-        callback({emoji: form.get(`comment-emoji`), text: form.get(`comment`), date: date.toISOString()});
+        const data = {emoji: form.get(`comment-emoji`), text: form.get(`comment`), date: date.toISOString()};
+
+        this.getElement().querySelector(`.film-details__inner`).disable = true;
+        if(!data.emoji || !data.text) {
+          this.getElement().querySelector(`.film-details__inner`).classList.add('shake');
+          return;
+        }
+        callback(data);
       }
     })
   }
 
   _closeHandler(callback) {
     callback();
-    this.removeElement();
+    this.getElement().remove();
   }
 
   _updateHandler(target, callback) {

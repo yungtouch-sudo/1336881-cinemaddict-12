@@ -3,7 +3,8 @@
 
   const Method = {
     GET: `GET`,
-    POST: `POST`
+    POST: `POST`,
+    DELETE: `DELETE`
   };
 
   const SuccessHTTPStatusRange = {
@@ -41,6 +42,13 @@
           console.log(film.comments.slice(-1));
          return  CommentsModel.adaptToClient(film.comments.slice(-1)[0])
         });
+    }
+
+    removeComment(id) {
+      return this._load({
+        url: `comments/${id}`,
+        method: Method.DELETE
+      });
     }
 
     _load({

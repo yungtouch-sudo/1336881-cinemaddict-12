@@ -14,4 +14,5 @@ export const SORT_TYPES = {
     WATCHLIST: `watchlist`,
     HISTORY: `history`,
     FAVORITES: `favorites`,
+    NOTHING: `nothing`
   };

@@ -1,4 +1,3 @@
-import FilterMenuContainer from "../views/FilterMenuContainerView";
 import FilterMenuItem from "../views/FilterMenuItemView";
 import {renderElement} from "../utils/dom";
 import {FILTERS} from "../utils/filters";
@@ -6,12 +5,10 @@ import {FILTER_TYPES} from "../consts.js";
 
 export default class FilterPresenter {
   constructor(container, filterModel, filmsModel) {
-    this.container = container;
+    this._container = container;
 
     this._filterModel = filterModel;
     this._filmsModel = filmsModel;
-
-    this._isFirstInit = true;
 
     this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -21,28 +18,17 @@ export default class FilterPresenter {
   }
 
   render() {
-    if(this._isFirstInit) {
-      this._prerender();
-    }
+
 
     this._currentFilter = this._filterModel.getFilter();
 
     const filtersData = this._getFiltersData();
 
-    this._filterComponent = new FilterMenuItem(filtersData, this._currentFilter);
-    this._filterComponent.setFilterChangeHandler(this._handleFilterTypeChange);
+    this._filterMenuItem = new FilterMenuItem(filtersData, this._currentFilter);
+    this._filterMenuItem.setFilterChangeHandler(this._handleFilterTypeChange);
 
-    this.container.textContent = ``;
-    renderElement(this.container, this._filterComponent.getElement(), `afterbegin`);
-  }
-
-  _prerender() {
-    const filterView = new FilterMenuContainer;
-
-    renderElement(this.container, filterView.getElement());
-    this.container = filterView.getElement().querySelector('.main-navigation__items-container');
-
-    this._isFirstInit = false;
+    this._container.textContent = ``;
+    renderElement(this._container, this._filterMenuItem.getElement(), `afterbegin`);
   }
 
   _handleFilterTypeChange(filterType) {
