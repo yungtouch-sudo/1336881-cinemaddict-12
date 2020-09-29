@@ -17,6 +17,3 @@ build/
 # Собранные JS-файлы (бандл)
 public/bundle.js
 public/bundle.js.map
-
-#Конфиг
-src/config.js
