@@ -1,4 +1,0 @@
-export default {
-    AUTHORIZATION: `Basic **API key**`,
-    END_POINT:`https://12.ecmascript.pages.academy/cinemaddict`
-}

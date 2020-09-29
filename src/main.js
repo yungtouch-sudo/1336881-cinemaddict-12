@@ -1,52 +1,84 @@
-import { renderElement } from './utils/dom';
-import FilterModel from './models/FilterModel';
-import FilmsModel from './models/FilmsModel';
-import SortModel from './models/SortModel';
-import FilterPresenter from "./presenters/FilterPresenter";
-import MainFilmListPresenter from './presenters/MainFilmListPresenter';
-import MostCommentedListPresenter from './presenters/MostCommentedListPresenter';
-import TopRatedListPresenter from './presenters/TopRatedListPresenter';
-import FilmsContainerView from "./views/FilmsContainerView";
-import UserRankView from './views/UserRankView';
-import LoadingView from './views/LoadingView';
-import SortPresenter from "./presenters/SortPresenter";
-import Api from './utils/Api';
-import CONFIG from './config';
+import {render, RenderPosition} from './utils/render.js';
+import {MenuItem, UpdateType} from './const.js';
+import Config from "./config.js";
+import MovieModel from './model/movies.js';
+import FilterModel from './model/filter.js';
+import UserProfilePresenter from './presenter/profile.js';
+import MovieList from './presenter/movie-list.js';
+import FilterPresenter from "./presenter/filter.js";
+import FooterStatistic from './view/footer-statisctic.js';
+import Statistics from './view/statistics.js';
+import Api from './api/index.js';
+import Store from "./api/store.js";
+import Provider from "./api/provider.js";
 
-const siteHeaderElement = document.querySelector(`.header`);
+
+const STORE_NAME = `${Config.STORE_PREFIX}-${Config.STORE_VER}`;
+
 const siteMainElement = document.querySelector(`.main`);
+const siteFooterElement = document.querySelector(`.footer`);
+const siteHeaderElement = document.querySelector(`.header`);
 
-const api = new Api(CONFIG.END_POINT, CONFIG.AUTHORIZATION);
+const moviesModel = new MovieModel();
+const filtersModel = new FilterModel();
 
-const filterModel = new FilterModel();
-const sortModel = new SortModel();
-const filmsModel = new FilmsModel(filterModel, sortModel);
+const api = new Api(Config.END_POINT, Config.AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
-const filmsContainerView = new FilmsContainerView();
+const filterPresenter = new FilterPresenter(siteMainElement, filtersModel, moviesModel);
+const moviePresenter = new MovieList(siteMainElement, moviesModel, filtersModel, apiWithProvider);
 
-const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
-const sortPresenter = new SortPresenter(siteMainElement, sortModel);
-const mainFilmListPresenter = new MainFilmListPresenter(filmsModel, filmsContainerView.getContainer());
-const mostCommentedListPresenter = new MostCommentedListPresenter(filmsModel, filmsContainerView.getElement());
-const topRatedListPresenter = new TopRatedListPresenter(filmsModel, filmsContainerView.getElement());
+const handleMainMenuClick = (menuItem) => {
+  if (menuItem === currentMenuMode) {
+    return;
+  }
 
-const userRankView = new UserRankView();
-const loadingView = new LoadingView();
+  switch (menuItem) {
+    case MenuItem.FILTER:
+      currentMenuMode = menuItem;
+      siteStatistic.destroy();
+      moviePresenter.init();
+      break;
+    case MenuItem.STATISTICS:
+      currentMenuMode = menuItem;
+      siteStatistic = new Statistics(moviesModel.get(), siteMainElement);
+      moviePresenter.destroy();
+      break;
+  }
+};
 
-renderElement(siteHeaderElement, userRankView.getElement());
-renderElement(siteMainElement, loadingView.getElement());
+let siteStatistic = null;
+let currentMenuMode = MenuItem.FILTER;
 
-api.getFilms().then((films) => {
-    loadingView.removeElement();
+filterPresenter.init();
+moviePresenter.init();
 
-    filmsModel.setFilms(films);
+apiWithProvider.getMovies().then((films) => {
 
-    filterPresenter.render();
-    sortPresenter.render();
+  moviesModel.set(UpdateType.INIT, films);
+  filterPresenter.turnOnFilters();
+  filterPresenter.setMenuClickHandler(handleMainMenuClick);
+  const userProfilePresenter = new UserProfilePresenter(siteHeaderElement, moviesModel);
+  userProfilePresenter.init();
+  render(siteFooterElement, new FooterStatistic(moviesModel.get().length), RenderPosition.BEFOREEND);
+})
+.catch(() => {
+  moviesModel.set(UpdateType.INIT, []);
+});
 
-    renderElement(siteMainElement, filmsContainerView.getElement());
 
-    mainFilmListPresenter.render();
-    topRatedListPresenter.render();
-    mostCommentedListPresenter.render();
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+  moviePresenter.setConnectionModeOnline();
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
+  moviePresenter.setConnectionModeOffline();
 });
